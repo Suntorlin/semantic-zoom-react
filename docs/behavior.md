@@ -195,3 +195,49 @@
   被插入词推到下一行的词会斜着滑过去；各条目同时长高，上方的头图被锚点补偿推出屏幕。
 - [R-83] 在 Full 层级再做一次 240→60px 的向内捏合，原版没有回到 Highlights（只滚动了一点）。
   原因没确认，可能是我的合成事件问题，不作为原版行为。
+
+---
+
+## 对照表：React 版实现状态（2026-10-17）
+
+✅ 已做并有测试；≈ 做了但和原版不同；✗ 没做。测试列写单元测试（U）或 E2E 测试（E）。
+
+| 编号 | 状态 | 说明 | 测试 |
+|---|---|---|---|
+| R-01..R-04 | ✅ | `LeveledText` / `LeveledToken`，同一条 token 流 | U |
+| R-05 | ≈ | 段落间距用 CSS 变量 `--sz-paragraph-gap`（默认 0.5em），不是固定 6px | E |
+| R-06..R-10 | ✅ | 标记解析逐行移植；错误类型是 `SyntaxError`（原版 `FormatException`） | U |
+| R-11..R-14 | ✅ | 码位范围照搬；字素切分用 `Intl.Segmenter`（无则退回码位） | U |
+| R-15..R-20 | ✅ | LCS 和合并逻辑逐行移植；错误类型是 `RangeError`（原版 `ArgumentError`） | U |
+| R-21..R-24 | ✅ | `checkVersions`，英文提示原文照搬 | U |
+| R-25..R-27 | ✅ | `LeveledPrompt.build` / `parseResponse`，提示词原文照搬 | U |
+| R-28..R-35 | ✅ | 控制器、1.6 级/倍、回弹 0.25、速度平滑、0.12 s 投射、弹簧（解析解） | U、E |
+| R-36 | ≈ | 用 `navigator.vibrate(8)`；只有安卓 Chrome 有效，iOS 网页没有触感接口 | 无 |
+| R-37 | ≈ | 按需求加强：减少动态时**捏合过程中也不做逐词动画**，直接按 round(z) 切换 | E |
+| R-38 | ✅ | 浏览器在隐藏副本里排版，每 token 一个 span，读回位置；按 (层级, 宽度) 缓存；空闲时预测量 | E |
+| R-39..R-42 | ✅ | 插值和透明度曲线逐项移植（easeInOutCubic、Interval 0.25/0.45、淡出 0.4 easeOut） | U、E |
+| R-43 | ≈ | 不需要：每个词是独立 DOM 元素，`transform`/`opacity` 由合成器处理 | 无 |
+| R-44 | ≈ | 静止时链接是一个连续的 `<a>`；**过渡中**链接词之间的空格没有下划线 | 无 |
+| R-45 | ✅ | 静止时始终是真实文字，可选择、可复制（不需要 SelectionArea） | E |
+| R-46..R-47 | ✅ | 手指中点下的条目；每帧先写高度，再读一次锚点位置，改 `scrollTop`，都在同一个 rAF 里 | E |
+| R-48 | ≈ | 开头方向由浏览器夹住（同原版）。结尾方向：原版靠弹性滚动临时越界；React 版在内容后面借一段留白，释放锚点后 250 ms 收回 | E |
+| R-49..R-52 | ✅ | 按钮/键盘锚定首个可见条目；弹簧结束后释放；`holdAnchor` 可叠加 | U、E |
+| R-53 | ✅ | 不适用：浏览器原生滚动没有高度估算问题 | 无 |
+| R-54 | ✅ | Pointer Events 跟踪两个触点 | E |
+| R-55 | ≈ | 不切换 overflow（避免滚动条宽度变化导致重排），改为两指时 `touchmove.preventDefault()` | E |
+| R-56 | ✅ | 捏合结束后 400 ms 内吞掉 click | E |
+| R-57 | ≈ | 浏览器只在捏合时给 wheel 带 ctrlKey，两指滚动是普通 wheel，不需要阈值 | E |
+| R-58 | ✅ | Ctrl+滚轮累乘 scale，160 ms 无事件即松手 | E |
+| R-59 | ✅ | Ctrl/⌘ + `=` `+` `-` `0` 和小键盘；另加 `keyboardShortcuts="global"` | E |
+| R-60..R-61 | ✅ | 手势开始清空单条层级；弹簧中新触摸释放锚点 | U、E |
+| R-62..R-65 | ✅ | 单条偏移 + 弹簧；点击规则同示例 | U、E |
+| R-66 | ≈ | `ExpandableLeveledText` 已做；没做 PageStorage / 状态恢复 | E |
+| R-67..R-68 | ✅ | 普通列表；聊天列表用 `column-reverse`，DOM 顺序仍按时间正序（读屏顺序正确） | E |
+| R-69 | ✅ | CSS Grid，列数公式同原版 | E |
+| R-70..R-74 | ✅ | `LeveledTextLoader`、`LazyLeveledTextView`、350 ms 揭示、`holdAnchor` | E |
+| R-75 | ≈ | 读屏读整段当前层级文字 ✅；**没有**做“每条是可调节控件”，改为单选按钮组 | E |
+| R-76..R-77 | ✅ | 静止时链接是真实 `<a>`；`LevelSwitcher` 单选组，方向键可用 | E |
+| R-78 | ≈ | 宽度变化和字体加载会重新测量；只改字号不改宽度的情况没处理 | 无 |
+| R-79 | ≈ | 见报告的性能数据（Chromium，CPU 降速 4 倍，240 条） | E |
+
+原版有、React 版没做：`maxLines` + 省略号、状态恢复（restorationId / PageStorage）、横向列表锚定、虚拟列表（只留了接口：`ZoomView`、`AnchorClient`、`data-sz-item`）。

@@ -28,7 +28,7 @@ test.describe('pinch on a phone', () => {
     await page.screenshot({ path: 'artifacts/e2e/phone-travel-full.png' })
   })
 
-  test('travel list: pinch back in to Highlights', async ({ page }) => {
+  test('travel list: pinch back in to Highlights, then spring back to the top like the original', async ({ page }) => {
     await open(page, 'travel')
     const cdp = await page.context().newCDPSession(page)
     await pinch(cdp, page, { x: 196, y: 540, from: 80, to: 220 })
@@ -37,12 +37,20 @@ test.describe('pinch on a phone', () => {
     await pinch(cdp, page, { x: 196, y: 420, from: 240, to: 70, steps: 24 })
     await settle(page, 'travel')
     const rec = await stopRecording(page)
-    const after = await edgeOf(page, 'travel', probe.index)
     expect((await state(page, 'travel')).level).toBe(0)
     const drift = rec.map((r) => r.edge - probe.edge)
-    console.log(`travel pinch-in: max drift ${maxAbs(drift).toFixed(2)}px, final ${(after - probe.edge).toFixed(2)}px`)
+    // While the list can still scroll, the item under the fingers holds;
+    // once the content is shorter than the screen it can't (R-48).
+    console.log(`travel pinch-in: drift over first half ${maxAbs(drift.slice(0, drift.length / 2)).toFixed(2)}px`)
+    expect(maxAbs(drift.slice(0, Math.floor(drift.length / 3)))).toBeLessThanOrEqual(2)
     expect(rec.every((r) => r.vv === 1)).toBe(true)
-    expect(Math.abs(after - probe.edge)).toBeLessThanOrEqual(2)
+    // The room borrowed past the end springs back: no blank space is left.
+    await page.waitForTimeout(400)
+    const end = await page.locator('[data-sz-list]').evaluate((el) => ({
+      scrollTop: el.scrollTop,
+      spacer: (el.querySelector('[data-sz-spacer]') as HTMLElement | null)?.offsetHeight ?? 0,
+    }))
+    expect(end).toEqual({ scrollTop: 0, spacer: 0 })
   })
 
   test('a small pinch snaps back; rubber band past the last level', async ({ page }) => {

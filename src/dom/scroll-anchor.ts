@@ -23,6 +23,8 @@ export interface ScrollAnchorOptions {
 
 /** Corrections smaller than this are ignored (R-47). */
 const EPSILON = 0.5
+/** How long borrowed room past the end takes to spring back. */
+const BOUNCE_MS = 250
 
 export class ScrollAnchor implements AnchorClient {
   readonly scroller: HTMLElement
@@ -40,8 +42,9 @@ export class ScrollAnchor implements AnchorClient {
    */
   private spacer: HTMLDivElement | null = null
   private spacerHeight = 0
+  private bounceRaf = 0
   private readonly onScroll = () => {
-    if (this.spacerHeight > 0 && !this.anchor) this.trimSpacer()
+    if (this.spacerHeight > 0 && !this.anchor && !this.bounceRaf) this.trimSpacer()
   }
 
   constructor(scroller: HTMLElement, opts: ScrollAnchorOptions = {}) {
@@ -53,6 +56,7 @@ export class ScrollAnchor implements AnchorClient {
 
   /** Removes listeners and the spacer. */
   destroy(): void {
+    if (this.bounceRaf) cancelAnimationFrame(this.bounceRaf)
     this.scroller.removeEventListener('scroll', this.onScroll)
     this.spacer?.remove()
     this.spacer = null
@@ -96,7 +100,31 @@ export class ScrollAnchor implements AnchorClient {
     return Array.from(this.scroller.querySelectorAll(this.selector))
   }
 
+  private stopBounce() {
+    if (this.bounceRaf) cancelAnimationFrame(this.bounceRaf)
+    this.bounceRaf = 0
+  }
+
+  /**
+   * Like Flutter's bouncing scroll physics: the room borrowed past the end of
+   * the content springs back once nothing is anchored any more.
+   */
+  private bounceBack() {
+    this.trimSpacer()
+    const from = this.spacerHeight
+    if (from <= 0) return
+    const start = performance.now()
+    const step = () => {
+      const t = Math.min(1, (performance.now() - start) / BOUNCE_MS)
+      const eased = 1 - (1 - t) ** 3
+      this.setSpacer(from * (1 - eased))
+      this.bounceRaf = t < 1 ? requestAnimationFrame(step) : 0
+    }
+    this.bounceRaf = requestAnimationFrame(step)
+  }
+
   captureAnchorAt(x: number, y: number): boolean {
+    this.stopBounce()
     this.anchor = null
     const hit = typeof document.elementFromPoint === 'function' ? document.elementFromPoint(x, y) : null
     const item = hit?.closest(this.selector)
@@ -116,6 +144,7 @@ export class ScrollAnchor implements AnchorClient {
   }
 
   captureLeadingAnchor(): boolean {
+    this.stopBounce()
     this.anchor = null
     const view = this.scroller.getBoundingClientRect()
     const items = this.items()
@@ -185,6 +214,6 @@ export class ScrollAnchor implements AnchorClient {
 
   releaseAnchor(): void {
     this.anchor = null
-    if (this.spacerHeight > 0) this.trimSpacer()
+    if (this.spacerHeight > 0) this.bounceBack()
   }
 }
