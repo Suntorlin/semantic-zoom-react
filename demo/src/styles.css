@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #f5f8fb;
+  color: #1b1f24;
+  font-family: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Links inside leveled text, at rest and while morphing. */
+[data-sz-text] a[data-sz-link] {
+  color: #1e6f8c;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+[data-sz-text] {
+  --sz-paragraph-gap: 0.35em;
+}
