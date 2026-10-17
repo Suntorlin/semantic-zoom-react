@@ -13,6 +13,8 @@ export interface LeveledTextViewProps extends Omit<HTMLAttributes<HTMLDivElement
   controller?: SemanticZoomController
   /** Called with a link's href instead of following it. */
   onLinkTap?: (href: string) => void
+  /** Clip words to the current height while they move (e.g. inside chat bubbles). Default false, like the original. */
+  clip?: boolean
   /** @internal Used by LazyLeveledTextView. */
   capZoom?: (z: number) => number
 }
@@ -34,17 +36,18 @@ export function LeveledTextView({
   controller: explicit,
   onLinkTap,
   capZoom,
+  clip,
   ...rest
 }: LeveledTextViewProps) {
   const controller = useSemanticZoom(explicit)
   const ref = useRef<HTMLDivElement>(null)
   const engine = useRef<LeveledTextEngine | null>(null)
-  const latest = useRef({ text, itemId, onLinkTap, capZoom })
-  latest.current = { text, itemId, onLinkTap, capZoom }
+  const latest = useRef({ text, itemId, onLinkTap, capZoom, clip })
+  latest.current = { text, itemId, onLinkTap, capZoom, clip }
 
   useLayoutEffect(() => {
-    const { text, itemId, onLinkTap, capZoom } = latest.current
-    const e = new LeveledTextEngine(ref.current!, controller, text, { itemId, onLinkTap, capZoom })
+    const { text, itemId, onLinkTap, capZoom, clip } = latest.current
+    const e = new LeveledTextEngine(ref.current!, controller, text, { itemId, onLinkTap, capZoom, clip })
     engine.current = e
     return () => {
       e.destroy()
@@ -57,8 +60,8 @@ export function LeveledTextView({
   }, [text])
 
   useEffect(() => {
-    engine.current?.setOptions({ itemId, onLinkTap, capZoom })
-  }, [itemId, onLinkTap, capZoom])
+    engine.current?.setOptions({ itemId, onLinkTap, capZoom, clip })
+  }, [itemId, onLinkTap, capZoom, clip])
 
   return <div {...rest} ref={ref} data-sz-text="" />
 }

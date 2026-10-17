@@ -172,7 +172,7 @@ function ChatDemo() {
                 onClick={tapToExpand(zoom, m.id)}
                 data-testid={`reply-${m.id}`}
               >
-                <LeveledTextView text={m.text} itemId={m.id} />
+                <LeveledTextView text={m.text} itemId={m.id} clip />
                 <div className="mt-1 text-[11px] text-slate-400">{m.time}</div>
               </div>
             </div>

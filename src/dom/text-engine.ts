@@ -29,6 +29,11 @@ export interface TextEngineOptions {
   onLinkTap?: (href: string) => void
   /** Limits the zoom this view shows (used by the lazy view while it loads). */
   capZoom?: (z: number) => number
+  /**
+   * Clip words to the current height while they move. Off by default, like
+   * the original, where words of the next level can show faintly below.
+   */
+  clip?: boolean
 }
 
 const LINK_ATTR = 'data-sz-link'
@@ -544,6 +549,7 @@ export class LeveledTextEngine implements ZoomView {
     // (an inline bubble, a flex item) would collapse to nothing: keep the
     // width the text was measured at until it is real text again.
     this.container.style.width = `${this.width}px`
+    if (this.opts.clip) this.container.style.overflow = 'clip'
     // Out of sight, still read by screen readers (R-75).
     this.flowEl.setAttribute(
       'style',
@@ -558,6 +564,7 @@ export class LeveledTextEngine implements ZoomView {
       if (this.morphEl) this.morphEl.style.display = 'none'
       this.container.style.height = ''
       this.container.style.width = ''
+      this.container.style.overflow = ''
       this.lastHeight = -1
       this.mode = 'flow'
     }
