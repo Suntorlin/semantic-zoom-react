@@ -72,7 +72,28 @@ test.describe('pinch on a phone', () => {
     await open(page, 'chat')
     const cdp = await page.context().newCDPSession(page)
     const probe = await startRecording(page, 'chat', 120, 420)
-    await pinch(cdp, page, { x: 196, y: 420, from: 80, to: 220 })
+    const widthBefore = (await page.getByTestId('reply-a19').boundingBox())!.width
+    const pts = (d: number) => [
+      { x: 196, y: 420 - d / 2, id: 1 },
+      { x: 196, y: 420 + d / 2, id: 2 },
+    ]
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: pts(80) })
+    for (let d = 85; d <= 220; d += 5) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: pts(d) })
+      await page.waitForTimeout(16)
+      if (d === 130) {
+        // Mid-gesture the bubbles keep their width (words never stack up vertically).
+        const mid = await page.evaluate(() => ({
+          morphing: document.querySelectorAll('[data-sz-morph]:not([style*="display: none"])').length,
+          widths: [...document.querySelectorAll('[data-testid^="reply-"] [data-sz-text]')].map((el) => el.getBoundingClientRect().width),
+        }))
+        expect(mid.morphing).toBeGreaterThan(0)
+        expect(Math.min(...mid.widths)).toBeGreaterThan(200)
+        expect((await page.getByTestId('reply-a19').boundingBox())!.width).toBeCloseTo(widthBefore, 0)
+        await page.screenshot({ path: 'artifacts/e2e/phone-chat-mid.png' })
+      }
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
     await settle(page, 'chat')
     const rec = await stopRecording(page)
     const after = await edgeOf(page, 'chat', probe.index)

@@ -23,7 +23,10 @@ export interface LeveledTextViewProps extends Omit<HTMLAttributes<HTMLDivElement
  * changes.
  *
  * At rest it is plain, selectable text that screen readers read in full.
- * Don't give this element padding or borders; put them on a wrapper.
+ * Don't give this element padding or borders; put them on a wrapper. Give
+ * it a definite width (a block, or `w-full` in a flex row), like the
+ * original fills its bounded width: in a shrink-to-fit parent the width is
+ * held while words move, then follows the new text.
  */
 export function LeveledTextView({
   text,

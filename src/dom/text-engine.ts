@@ -540,6 +540,10 @@ export class LeveledTextEngine implements ZoomView {
 
   private _hideFlow() {
     if (this.mode !== 'flow') return
+    // The words are absolutely positioned now, so a shrink-to-fit parent
+    // (an inline bubble, a flex item) would collapse to nothing: keep the
+    // width the text was measured at until it is real text again.
+    this.container.style.width = `${this.width}px`
     // Out of sight, still read by screen readers (R-75).
     this.flowEl.setAttribute(
       'style',
@@ -553,6 +557,7 @@ export class LeveledTextEngine implements ZoomView {
       this.flowEl.removeAttribute('style')
       if (this.morphEl) this.morphEl.style.display = 'none'
       this.container.style.height = ''
+      this.container.style.width = ''
       this.lastHeight = -1
       this.mode = 'flow'
     }

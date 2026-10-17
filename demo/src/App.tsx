@@ -168,7 +168,7 @@ function ChatDemo() {
           return (
             <div className="flex justify-start">
               <div
-                className="max-w-[88%] cursor-pointer rounded-2xl rounded-bl-sm bg-white px-3.5 py-2.5 text-[15px] leading-[1.5] text-slate-900 shadow-sm ring-1 ring-slate-200"
+                className="w-[88%] cursor-pointer rounded-2xl rounded-bl-sm bg-white px-3.5 py-2.5 text-[15px] leading-[1.5] text-slate-900 shadow-sm ring-1 ring-slate-200"
                 onClick={tapToExpand(zoom, m.id)}
                 data-testid={`reply-${m.id}`}
               >
