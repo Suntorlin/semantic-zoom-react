@@ -229,7 +229,7 @@ test.describe('performance', () => {
     // Let the idle pre-measurement finish, as it would before a real pinch.
     await page.waitForTimeout(2500)
     const cdp = await page.context().newCDPSession(page)
-    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 })
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.CPU_RATE ?? 4) })
     await page.evaluate(() => {
       const c = window.__sz!.perf
       c.frameStats.enabled = true
