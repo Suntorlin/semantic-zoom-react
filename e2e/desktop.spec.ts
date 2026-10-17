@@ -99,9 +99,21 @@ test('grid: two columns on a wide screen; ctrl+wheel keeps the card under the po
   const probe = await startRecording(page, 'health', box.x + 40, box.y + 20)
   await ctrlWheel(cdp, page, box.x + 40, box.y + 20, -15, 25)
   await settle(page, 'health')
-  await stopRecording(page)
+  const rec = await stopRecording(page)
   expect((await state(page, 'health')).level).toBe(2)
-  expect(Math.abs((await edgeOf(page, 'health', probe.index)) - probe.edge)).toBeLessThanOrEqual(2)
+  // The card holds while the zoom moves. The grid is still shorter than the
+  // window at Full, so afterwards the borrowed room springs back and the
+  // grid returns to its natural place, as with the original's bouncing physics.
+  const drift = maxAbs(rec.map((r) => r.edge - probe.edge))
+  console.log(`grid ctrl+wheel: max drift while zooming ${drift.toFixed(2)}px`)
+  expect(drift).toBeLessThanOrEqual(2)
+  await page.waitForTimeout(400)
+  const end = await page.locator('[data-sz-grid]').evaluate((el) => ({
+    scrollTop: el.scrollTop,
+    blank: (el.querySelector('[data-sz-spacer]') as HTMLElement | null)?.offsetHeight ?? 0,
+  }))
+  expect(end.blank).toBe(0)
+  expect(await edgeOf(page, 'health', probe.index)).toBeGreaterThan(0)
   await page.screenshot({ path: 'artifacts/e2e/desktop-health.png' })
 })
 
