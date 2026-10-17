@@ -1,0 +1,44 @@
+{
+  "name": "semantic-zoom-react",
+  "version": "0.1.0",
+  "description": "Pinch to change how much a list says, not how big it is. A React port of the Flutter package semantic_zoom.",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "LICENSE", "README.md"],
+  "sideEffects": false,
+  "scripts": {
+    "dev": "vite --config demo/vite.config.ts",
+    "build": "tsc -p tsconfig.lib.json",
+    "build:demo": "vite build --config demo/vite.config.ts",
+    "preview": "vite preview --config demo/vite.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "e2e": "playwright test"
+  },
+  "peerDependencies": {
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/vite": "^4.1.18",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.1.2",
+    "jsdom": "^26.1.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16"
+  }
+}
