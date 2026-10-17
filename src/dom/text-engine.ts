@@ -238,14 +238,16 @@ function runIdle(deadline: { timeRemaining(): number }) {
   idleScheduled = false
   while (idleQueue.size && deadline.timeRemaining() > 2) {
     const batch = new MeasureBatch()
-    let n = 0
+    const done: LeveledTextEngine[] = []
     for (const e of idleQueue) {
       idleQueue.delete(e)
       if (!e.container.isConnected) continue
       e._requestAll(batch)
-      if (++n >= 6) break
+      done.push(e)
+      if (done.length >= 6) break
     }
     if (batch.size) batch.flush()
+    for (const e of done) e._idleWork()
   }
   if (idleQueue.size) {
     idleScheduled = true
@@ -366,7 +368,25 @@ export class LeveledTextEngine implements ZoomView {
   _setVisible(v: boolean): void {
     if (v === this.visible) return
     this.visible = v
-    if (v) this.controller.scheduleFrame()
+    if (v) {
+      this.controller.scheduleFrame()
+      // Build the word layer ahead of the next pinch.
+      if (!this.morphEl) enqueueIdle(this)
+    }
+  }
+
+  /** Work done while the browser is idle, after measuring. */
+  _idleWork(): void {
+    // Off-screen items left at a pinned height after a level change get
+    // their real text now, a few at a time, instead of all in one frame.
+    if (this.mode === 'height' && !this.controller.isGesturing) {
+      const z = this._zoom()
+      if (Math.abs(z - Math.round(z)) < EPS) this._enterFlow(this._shownLevel(z))
+    }
+    if (this.visible && !this.morphEl && this.text.tokens.length) {
+      this._ensureMorph()
+      this.morphEl!.style.display = 'none'
+    }
   }
 
   _setWidth(w: number): void {
@@ -422,7 +442,20 @@ export class LeveledTextEngine implements ZoomView {
     const atRest = (!ctl.isGesturing && Math.abs(z - rounded) < EPS) || ctl.reduceMotion
     if (atRest) {
       const level = this._shownLevel(z)
-      this.plan = this.mode === 'flow' && this.flowLevel === level ? 'none' : 'flow'
+      if (this.mode === 'flow' && this.flowLevel === level) {
+        this.plan = 'none'
+        return
+      }
+      const pinned = this.cache.get(level)
+      if (!this.visible && pinned && this.cacheWidth === this.width) {
+        // Off-screen: keep the right height now, swap in the text when idle.
+        this.plan = 'height'
+        this.planLo = this.planHi = level
+        this.planMove = 0
+        enqueueIdle(this)
+        return
+      }
+      this.plan = 'flow'
       this.planLevel = level
       return
     }

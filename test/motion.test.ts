@@ -131,3 +131,7 @@ describe('token opacity (R-42)', () => {
     }
   })
 })
+
+test('snapping never yields -0', () => {
+  expect(Object.is(snapLevel(-0.4, 0, 2), 0)).toBe(true)
+})

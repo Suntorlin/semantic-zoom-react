@@ -4,7 +4,8 @@
 export type Curve = (t: number) => number
 
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
-export const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v)
+// `+ 0` turns -0 (e.g. Math.round(-0.4)) into 0.
+export const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v) + 0
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
 /** CSS-style cubic Bézier easing, like Flutter's `Cubic`. */

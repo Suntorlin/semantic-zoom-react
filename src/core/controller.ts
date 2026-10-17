@@ -99,6 +99,7 @@ export class SemanticZoomController {
   private readonly _clients = new Set<AnchorClient>()
   private readonly _listeners = new Set<Listener>()
   private readonly _gestureListeners = new Set<Listener>()
+  private readonly _frameListeners = new Set<Listener>()
   private _anchorGeneration = 0
   private _pinchAnchored = false
   private _itemAnchorGeneration: number | null = null
@@ -186,6 +187,15 @@ export class SemanticZoomController {
   subscribeGesture = (listener: Listener): (() => void) => {
     this._gestureListeners.add(listener)
     return () => this._gestureListeners.delete(listener)
+  }
+
+  /**
+   * Called after every frame, once views have been drawn and anchors
+   * corrected. For diagnostics, tests and UI that must follow the zoom.
+   */
+  addFrameListener(listener: Listener): () => void {
+    this._frameListeners.add(listener)
+    return () => this._frameListeners.delete(listener)
   }
 
   private _notify() {
@@ -282,6 +292,7 @@ export class SemanticZoomController {
       this.frameStats.work.push(now() - t0)
       if (this.frameStats.work.length > 5000) this.frameStats.work.shift()
     }
+    for (const l of this._frameListeners) l()
     if (active) this.scheduleFrame()
   }
 
