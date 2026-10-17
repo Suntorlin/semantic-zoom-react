@@ -58,7 +58,11 @@ export function Journal() {
 ```
 
 Don't put padding or borders on the `LeveledTextView` element itself; put
-them on a wrapper. The view positions words relative to its own box.
+them on a wrapper. The view positions words relative to its own box. Give it
+a definite width (a block, or `w-full` in a flex row); in a shrink-to-fit
+parent its width is held while words move and follows the new text after.
+Inside chat bubbles, `clip` keeps the next level's words inside the bubble
+while they fade in.
 
 ## Input
 
