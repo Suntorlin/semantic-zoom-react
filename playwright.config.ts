@@ -7,12 +7,15 @@ export default defineConfig({
   timeout: 60_000,
   fullyParallel: false,
   workers: 1,
-  reporter: [['list'], ['json', { outputFile: 'artifacts/e2e-results.json' }]],
+  forbidOnly: !!process.env.CI,
+  reporter: process.env.CI
+    ? [['list'], ['github'], ['json', { outputFile: 'artifacts/e2e-results.json' }]]
+    : [['list'], ['json', { outputFile: 'artifacts/e2e-results.json' }]],
   use: { baseURL: 'http://localhost:5189/', trace: 'off' },
   webServer: {
     command: 'bunx vite build --config demo/vite.config.ts && bunx vite preview --config demo/vite.config.ts',
     url: 'http://localhost:5189/',
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
   projects: [
