@@ -2,14 +2,18 @@
 
 **Pinch to change how much a list says, not how big it is.**
 
-A React port of the Flutter package
+An unofficial React port of the Flutter package
 [semantic_zoom](https://github.com/Roshendz/semantic_zoom) by Roshen De Zoysa
-(MIT). Pinch out and every entry grows from a title, to a one-line summary,
+(MIT). It is not affiliated with or endorsed by the original author; all
+credit for the idea, the algorithms and the English demo content (travel,
+inbox and reads) goes to them.
+
+Pinch out and every entry grows from a title, to a one-line summary,
 to the full text. The font size never changes. Words already on screen slide
 to their new spots and new words fade in around them. The entry under your
 fingers stays where it is.
 
-**Live demo:** https://sz-demo.suntorai.com (best on a phone: pinch the list; on a desktop use ctrl + scroll, a trackpad pinch, or Ctrl/⌘ + / −). It is served from a developer machine, so it can be offline.
+**Live demo:** https://sz-demo.suntorai.com (best on a phone: pinch the list; on a desktop use ctrl + scroll, a trackpad pinch, or Ctrl/⌘ + / −). It is hosted on a personal machine, so it can be offline at times.
 
 It is not published to npm.
 
@@ -92,11 +96,11 @@ and mark anchorable items with `data-sz-item`.
 ## Load on demand
 
 ```tsx
-const loader = LeveledTextLoader.versions({ brief: visit.title, load: () => api.fetchSummaries(visit.id) })
+const loader = LeveledTextLoader.versions({ brief: thread.subject, load: () => api.fetchSummaries(thread.id) })
 
 <LazyLeveledTextView
   loader={loader}
-  itemId={visit.id}
+  itemId={thread.id}
   renderLoading={() => <Progress />}
   renderError={(error, retry) => <button onClick={retry}>Retry</button>}
 />
@@ -153,10 +157,6 @@ bun run e2e          # Playwright: phone Chromium (CDP touch), desktop Chromium,
 bun run build        # library to dist/
 ```
 
-The live demo is `demo/dist` served by `~/.sz-demo/server.ts` (port 3041) behind the
-Cloudflare tunnel `sz-demo` (`~/.cloudflared/sz-demo.yml`), both in screen sessions
-`sz-demo-web` and `sz-demo-tunnel`. To update it: `bun run build:demo`, copy
-`demo/dist` into a new `~/.sz-demo/releases/<date>-<sha>` and repoint `~/.sz-demo/current`.
 
 ## Credits and license
 

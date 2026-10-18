@@ -54,6 +54,15 @@
   "author": "suntor (React port); Roshen De Zoysa (original Flutter package)",
   "repository": {
     "type": "git",
-    "url": "local only"
-  }
+    "url": "https://github.com/Suntorlin/semantic-zoom-react"
+  },
+  "homepage": "https://sz-demo.suntorai.com",
+  "keywords": [
+    "react",
+    "semantic-zoom",
+    "pinch",
+    "stretchtext",
+    "progressive-disclosure",
+    "telescopic-text"
+  ]
 }

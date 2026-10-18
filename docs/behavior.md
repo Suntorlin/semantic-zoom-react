@@ -210,7 +210,7 @@
 | R-11..R-14 | ✅ | 码位范围照搬；字素切分用 `Intl.Segmenter`（无则退回码位） | U |
 | R-15..R-20 | ✅ | LCS 和合并逻辑逐行移植；错误类型是 `RangeError`（原版 `ArgumentError`） | U |
 | R-21..R-24 | ✅ | `checkVersions`，英文提示原文照搬 | U |
-| R-25..R-27 | ✅ | `LeveledPrompt.build` / `parseResponse`，提示词原文照搬 | U |
+| R-25..R-27 | ✅ | `LeveledPrompt.build` / `parseResponse`，提示词原文照搬；只有生长示例从原版的医疗例子（Knee review）换成了火车旅行 | U |
 | R-28..R-35 | ✅ | 控制器、1.6 级/倍、回弹 0.25、速度平滑、0.12 s 投射、弹簧（解析解） | U、E |
 | R-36 | ≈ | 用 `navigator.vibrate(8)`；只有安卓 Chrome 有效，iOS 网页没有触感接口 | 无 |
 | R-37 | ≈ | 按需求加强：减少动态时**捏合过程中也不做逐词动画**，直接按 round(z) 切换 | E |
@@ -233,7 +233,7 @@
 | R-62..R-65 | ✅ | 单条偏移 + 弹簧；点击规则同示例 | U、E |
 | R-66 | ≈ | `ExpandableLeveledText` 已做；没做 PageStorage / 状态恢复 | E |
 | R-67..R-68 | ✅ | 普通列表；聊天列表用 `column-reverse`，DOM 顺序仍按时间正序（读屏顺序正确） | E |
-| R-69 | ✅ | CSS Grid，列数公式同原版 | E |
+| R-69 | ✅ | CSS Grid，列数公式同原版。演示页的网格用游记卡片，没有用原版的医疗示例（Health） | E |
 | R-70..R-74 | ✅ | `LeveledTextLoader`、`LazyLeveledTextView`、350 ms 揭示、`holdAnchor` | E |
 | R-75 | ≈ | 读屏读整段当前层级文字 ✅；**没有**做“每条是可调节控件”，改为单选按钮组 | E |
 | R-76..R-77 | ✅ | 静止时链接是真实 `<a>`；`LevelSwitcher` 单选组，方向键可用 | E |

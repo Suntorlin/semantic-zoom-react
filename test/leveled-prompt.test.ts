@@ -5,14 +5,14 @@ import { LeveledPrompt, LeveledPromptFormatError } from '../src/core/leveled-pro
 
 describe('LeveledPrompt.build (R-25)', () => {
   test('describes each level, the rules and the source', () => {
-    const p = LeveledPrompt.build({ source: '  Patient seen for knee pain.  ' })
+    const p = LeveledPrompt.build({ source: '  Took the night train to Porto.  ' })
     expect(p).toContain('Write 3 versions')
     expect(p).toContain('1. a title of at most 6 words')
     expect(p).toContain('3. the complete text')
     expect(p).toContain('Only insert new words')
     expect(p).toContain('Do not add facts')
     expect(p).toContain('{"levels": ["version 1", "version 2", ...]}')
-    expect(p.endsWith('"""\nPatient seen for knee pain.\n"""')).toBe(true)
+    expect(p.endsWith('"""\nTook the night train to Porto.\n"""')).toBe(true)
   })
 
   test('custom levels, descriptions and instructions', () => {

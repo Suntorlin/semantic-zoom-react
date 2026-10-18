@@ -91,16 +91,16 @@ test('programmatic setLevel', async ({ page }) => {
 })
 
 test('grid: two columns on a wide screen; ctrl+wheel keeps the card under the pointer', async ({ page }) => {
-  await open(page, 'health')
+  await open(page, 'grid')
   const cols = await page.locator('[data-sz-grid] > div').evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length)
   expect(cols).toBeGreaterThanOrEqual(2)
   const cdp = await page.context().newCDPSession(page)
   const box = (await page.locator('[data-sz-item][data-index="2"]').boundingBox())!
-  const probe = await startRecording(page, 'health', box.x + 40, box.y + 20)
+  const probe = await startRecording(page, 'grid', box.x + 40, box.y + 20)
   await ctrlWheel(cdp, page, box.x + 40, box.y + 20, -15, 25)
-  await settle(page, 'health')
+  await settle(page, 'grid')
   const rec = await stopRecording(page)
-  expect((await state(page, 'health')).level).toBe(2)
+  expect((await state(page, 'grid')).level).toBe(2)
   // The card holds while the zoom moves. The grid is still shorter than the
   // window at Full, so afterwards the borrowed room springs back and the
   // grid returns to its natural place, as with the original's bouncing physics.
@@ -113,8 +113,8 @@ test('grid: two columns on a wide screen; ctrl+wheel keeps the card under the po
     blank: (el.querySelector('[data-sz-spacer]') as HTMLElement | null)?.offsetHeight ?? 0,
   }))
   expect(end.blank).toBe(0)
-  expect(await edgeOf(page, 'health', probe.index)).toBeGreaterThan(0)
-  await page.screenshot({ path: 'artifacts/e2e/desktop-health.png' })
+  expect(await edgeOf(page, 'grid', probe.index)).toBeGreaterThan(0)
+  await page.screenshot({ path: 'artifacts/e2e/desktop-grid.png' })
 })
 
 test('reads: expandable text needs no controller', async ({ page }) => {

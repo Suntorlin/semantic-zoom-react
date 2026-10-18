@@ -1,6 +1,6 @@
 import type { CDPSession, Page } from '@playwright/test'
 
-export type Tab = 'chat' | 'travel' | 'health' | 'inbox' | 'reads' | 'perf'
+export type Tab = 'chat' | 'travel' | 'grid' | 'inbox' | 'reads' | 'perf'
 
 export async function open(page: Page, tab: Tab) {
   await page.goto(`./#${tab}`)

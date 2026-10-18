@@ -12,7 +12,7 @@ import {
   useSemanticZoomController,
 } from '../../src'
 import { aiChat } from './data/ai-chat'
-import { articles, threads, trip, visits } from './data/original'
+import { articles, threads, trip } from './data/original'
 
 // Exposed for the end-to-end tests and benchmarks.
 declare global {
@@ -30,7 +30,7 @@ function useExpose(name: string, c: SemanticZoomController) {
 const TABS = [
   { id: 'chat', label: 'AI 对话', icon: '💬' },
   { id: 'travel', label: 'Travel', icon: '🗺️' },
-  { id: 'health', label: 'Health', icon: '🩺' },
+  { id: 'grid', label: 'Grid', icon: '🗂️' },
   { id: 'inbox', label: 'Inbox', icon: '📥' },
   { id: 'reads', label: 'Reads', icon: '📰' },
   { id: 'perf', label: '240 条', icon: '⚡' },
@@ -54,7 +54,7 @@ export function App() {
       <main className="relative min-h-0 flex-1">
         {tab === 'chat' && <ChatDemo />}
         {tab === 'travel' && <TravelDemo />}
-        {tab === 'health' && <HealthDemo />}
+        {tab === 'grid' && <GridDemo />}
         {tab === 'inbox' && <InboxDemo />}
         {tab === 'reads' && <ReadsDemo />}
         {tab === 'perf' && <PerfDemo />}
@@ -223,16 +223,16 @@ function TravelDemo() {
   )
 }
 
-// ───────────────────────────── Health: grid ─────────────────────────────
+// ───────────────────────────── Grid: trip cards ─────────────────────────────
 
-function HealthDemo() {
-  const zoom = useSemanticZoomController({ levelLabels: ['Visit titles', 'Visit summaries', 'Clinician notes'] })
-  useExpose('health', zoom)
+function GridDemo() {
+  const zoom = useSemanticZoomController({ levelLabels: ['Highlights', 'Day summary', 'Full entry'] })
+  useExpose('grid', zoom)
   return (
     <Screen
-      title="Patient timeline"
-      subtitle="Visit title › summary › clinician notes"
-      footer={<Levels controller={zoom} labels={['Titles', 'Summary', 'Notes']} />}
+      title="Trip cards"
+      subtitle="A grid: each row grows with its tallest card"
+      footer={<Levels controller={zoom} labels={['Highlights', 'Summary', 'Full']} />}
     >
       <SemanticZoomGrid
         controller={zoom}
@@ -241,14 +241,14 @@ function HealthDemo() {
         contentClassName="px-4 pb-4"
         maxColumnWidth={380}
         gap={12}
-        itemCount={visits.length}
+        itemCount={trip.length}
         renderItem={(i) => {
-          const [date, dept, text] = visits[i]
+          const [date, place, text] = trip[i]
           return (
             <div className="cursor-pointer rounded-xl border border-slate-300 bg-white p-4" onClick={tapToExpand(zoom, i)}>
-              <div className="text-sm font-medium">{`${date} · ${dept}`}</div>
+              <div className="text-sm font-medium">{`${date} · ${place}`}</div>
               <div className="h-2" />
-              <LeveledTextView text={text} itemId={i} className="text-base leading-normal" />
+              <LeveledTextView text={text} itemId={i} onLinkTap={openLink} className="text-base leading-normal" />
             </div>
           )
         }}

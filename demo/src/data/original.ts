@@ -61,52 +61,6 @@ export const trip: [date: string, place: string, text: LeveledText][] = [
   ],
 ]
 
-export const visits: [date: string, dept: string, text: LeveledText][] = [
-  [
-    'Mar 12',
-    'Cardiology',
-    LeveledText.fromVersions([
-      'Blood pressure follow-up',
-      'Blood pressure follow-up: readings improved, **dose unchanged**',
-      'Blood pressure follow-up: home readings averaged **128/82** over four ' +
-        'weeks, readings improved since January, **dose unchanged**. Continue ' +
-        'low-sodium diet and review again in three months.',
-    ]),
-  ],
-  [
-    'Feb 02',
-    'General practice',
-    LeveledText.fromVersions([
-      'Annual check-up',
-      'Annual check-up with routine blood tests, all normal',
-      'Annual check-up with routine blood tests, all normal. Vitamin D ' +
-        'slightly low; supplement advised through winter. Flu vaccine ' +
-        'given.',
-    ]),
-  ],
-  [
-    'Jan 15',
-    'Physiotherapy',
-    LeveledText.fromVersions([
-      'Knee review',
-      'Knee review: swelling reduced, cleared to run',
-      'Knee review after six sessions: swelling reduced and range of motion ' +
-        'restored, cleared to run twice a week. Keep strength exercises ' +
-        'daily.',
-    ]),
-  ],
-  [
-    'Jan 03',
-    'Dermatology',
-    LeveledText.fromVersions([
-      'Skin check, nothing concerning',
-      'Full skin check found no concerning moles',
-      'Full skin check by Dr Rossi found no concerning moles. One mole on ' +
-        'the left shoulder photographed as a baseline; recheck next year.',
-    ]),
-  ],
-]
-
 export const threads: [from: string, time: string, versions: string[]][] = [
   [
     'Maya · Design',

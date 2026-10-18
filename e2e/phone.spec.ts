@@ -235,12 +235,12 @@ test.describe('pinch on a phone', () => {
   })
 
   test('grid on a phone is one column and zooms with the buttons', async ({ page }) => {
-    await open(page, 'health')
+    await open(page, 'grid')
     const cols = await page.locator('[data-sz-grid] > div').evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length)
     expect(cols).toBe(1)
-    await page.getByRole('radio', { name: 'Notes' }).click()
-    await settle(page, 'health')
-    await expect(page.locator('[data-sz-item][data-index="0"] [data-sz-flow]')).toContainText('low-sodium diet')
+    await page.getByRole('radio', { name: 'Full' }).click()
+    await settle(page, 'grid')
+    await expect(page.locator('[data-sz-item][data-index="0"] [data-sz-flow]')).toContainText('Pastéis de nata')
   })
 })
 

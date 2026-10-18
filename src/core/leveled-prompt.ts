@@ -20,14 +20,13 @@ export const defaultLevelDescriptions = [
 ] as const
 
 // Each line only inserts words into the one before it.
+// (The original package uses a medical example here; this port uses travel.)
 const EXAMPLE = [
-  'Knee review',
-  'Knee review: swelling reduced, cleared to run',
-  'Knee review after six sessions: swelling reduced and range of motion ' +
-    'restored, cleared to run twice a week.',
-  'Knee review after six sessions with the physiotherapist: swelling ' +
-    'reduced and range of motion fully restored, cleared to run twice a ' +
-    'week on flat ground.',
+  'Train to Porto',
+  'Train to Porto along the coast, window seat',
+  'Train to Porto along the coast in three hours, window seat on the left.',
+  'Train to Porto along the Atlantic coast in three hours, window seat on ' +
+    'the left as the inspector advised.',
 ]
 
 function descriptionsFor(levels: number): string[] {

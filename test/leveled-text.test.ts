@@ -84,13 +84,13 @@ describe('rich markup (R-07, R-08)', () => {
 
   test('fromVersions reads markdown from LLM output', () => {
     const t = LeveledText.fromVersions([
-      'Knee review',
-      'Knee review: **cleared to run**',
-      'Knee review: **cleared to run** twice a week, see [plan](p1).',
+      'Tram ride',
+      'Tram ride: **worth the queue**',
+      'Tram ride: **worth the queue** twice over, see [plan](p1).',
     ])
-    expect(t.textAt(1)).toBe('Knee review: cleared to run')
-    expect(t.textAt(2)).toBe('Knee review: cleared to run twice a week, see plan.')
-    expect(t.tokens.find((k) => k.text === 'run')!.style).toEqual({ bold: true })
+    expect(t.textAt(1)).toBe('Tram ride: worth the queue')
+    expect(t.textAt(2)).toBe('Tram ride: worth the queue twice over, see plan.')
+    expect(t.tokens.find((k) => k.text === 'queue')!.style).toEqual({ bold: true })
     expect(t.tokens.find((k) => k.text === 'plan')!.link).toBe('p1')
   })
 
@@ -114,10 +114,10 @@ describe('LeveledText.fromVersions (R-15..R-20)', () => {
 
   test('splits punctuation so versions round-trip exactly', () => {
     const versions = [
-      'Blood pressure follow-up',
-      'Blood pressure follow-up: readings improved, dose unchanged',
-      'Blood pressure follow-up: home readings averaged 128/82 over four ' +
-        'weeks, readings improved, dose unchanged. Review in three months.',
+      'Q3 budget review',
+      'Q3 budget review: spending improved, hiring unchanged',
+      'Q3 budget review: travel spending averaged 4.2k/month over four ' +
+        'months, spending improved, hiring unchanged. Review in three months.',
     ]
     const t = LeveledText.fromVersions(versions)
     versions.forEach((v, i) => expect(t.textAt(i)).toBe(v))
@@ -169,11 +169,10 @@ describe('LeveledText.fromVersions (R-15..R-20)', () => {
   })
 
   test('matching is case-sensitive (R-18)', () => {
-    const t = LeveledText.fromVersions(['Skin check, nothing concerning', 'Full skin check found no concerning moles'])
-    const skin = t.tokens.find((k) => k.text === 'Skin')!
-    expect(skin.maxLevel).toBe(0)
-    expect(t.tokens.find((k) => k.text === 'check')!.maxLevel).toBeNull()
-    expect(t.tokens.find((k) => k.text === 'concerning')!.maxLevel).toBeNull()
+    const t = LeveledText.fromVersions(['Sunset walk, nothing planned', 'Long sunset walk with nothing else planned'])
+    expect(t.tokens.find((k) => k.text === 'Sunset')!.maxLevel).toBe(0)
+    expect(t.tokens.find((k) => k.text === 'walk')!.maxLevel).toBeNull()
+    expect(t.tokens.find((k) => k.text === 'planned')!.maxLevel).toBeNull()
   })
 })
 
@@ -297,15 +296,14 @@ describe('tokenizer: unspaced scripts per character (R-11..R-14)', () => {
 describe('checkVersions (R-21..R-24)', () => {
   test('strict versions', () => {
     const r = LeveledText.checkVersions([
-      'Knee review',
-      'Knee review: swelling reduced, cleared to run',
-      'Knee review after six sessions: swelling reduced and range of ' +
-        'motion restored, cleared to run twice a week.',
+      'Train to Porto',
+      'Train to Porto along the coast, window seat',
+      'Train to Porto along the coast in three hours, window seat on the left.',
     ])
     expect(r.isStrict).toBe(true)
     expect(r.smoothness).toBe(1)
     expect(r.issues).toEqual([])
-    expect(r.transitions[0].kept).toBe(2)
+    expect(r.transitions[0].kept).toBe(3)
     expect(r.transitions[0].added).toBe(5)
   })
 
