@@ -9,7 +9,9 @@ to the full text. The font size never changes. Words already on screen slide
 to their new spots and new words fade in around them. The entry under your
 fingers stays where it is.
 
-This is a local port. It is not published to npm.
+**Live demo:** https://sz-demo.suntorai.com (best on a phone: pinch the list; on a desktop use ctrl + scroll, a trackpad pinch, or Ctrl/⌘ + / −). It is served from a developer machine, so it can be offline.
+
+It is not published to npm.
 
 - Core: zero runtime dependencies. React ≥ 18.2 is a peer dependency.
 - Size: about 44 KB minified, 16 KB gzipped (everything, including the React components).
@@ -150,6 +152,11 @@ bun run test         # unit tests (Vitest)
 bun run e2e          # Playwright: phone Chromium (CDP touch), desktop Chromium, phone WebKit
 bun run build        # library to dist/
 ```
+
+The live demo is `demo/dist` served by `~/.sz-demo/server.ts` (port 3041) behind the
+Cloudflare tunnel `sz-demo` (`~/.cloudflared/sz-demo.yml`), both in screen sessions
+`sz-demo-web` and `sz-demo-tunnel`. To update it: `bun run build:demo`, copy
+`demo/dist` into a new `~/.sz-demo/releases/<date>-<sha>` and repoint `~/.sz-demo/current`.
 
 ## Credits and license
 
