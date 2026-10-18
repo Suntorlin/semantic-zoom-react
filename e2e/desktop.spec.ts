@@ -145,3 +145,25 @@ test('reads: expandable text needs no controller', async ({ page }) => {
   await expect(card).toContainText('窗外的风景非常美丽。')
   await expect(card.getByRole('button', { name: 'Show less' })).toBeVisible()
 })
+
+test('no visible scrollbars, but every pane still scrolls', async ({ page }) => {
+  for (const tab of ['chat', 'travel', 'grid', 'inbox', 'reads', 'perf']) {
+    await page.goto(`./#${tab}`)
+    await page.waitForTimeout(300)
+    const panes = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('*')]
+        .filter((el) => /(auto|scroll)/.test(getComputedStyle(el).overflowY))
+        .map((el) => ({ hidden: getComputedStyle(el).scrollbarWidth === 'none', gutter: el.offsetWidth - el.clientWidth })),
+    )
+    expect(panes.length, tab).toBeGreaterThan(0)
+    for (const p of panes) {
+      expect(p.hidden, tab).toBe(true)
+      expect(p.gutter, tab).toBe(0)
+    }
+  }
+  await page.goto('./#perf')
+  await page.mouse.move(400, 400)
+  await page.mouse.wheel(0, 500)
+  await page.waitForTimeout(300)
+  expect(await page.locator('[data-sz-list]').evaluate((el) => el.scrollTop)).toBeGreaterThan(100)
+})

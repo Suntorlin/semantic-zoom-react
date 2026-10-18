@@ -65,6 +65,22 @@ html {
   color: var(--social-fg);
 }
 
+/*
+ * No visible scrollbars anywhere (HAQI rule 9). Panes still scroll by
+ * wheel, trackpad, touch and keyboard. Chrome 121+ uses scrollbar-width and
+ * ignores ::-webkit-scrollbar once it is set, so both are needed.
+ */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 /* Translucent header / tab bar. */
 .social-bar {
   background: var(--social-bar-bg);
