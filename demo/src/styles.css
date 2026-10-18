@@ -1,5 +1,53 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens from the HAQI web design system (haqi/web/DESIGN.md):
+ * visual = Instagram (monochrome zinc, pills, big radii, flat),
+ * interaction = Apple HIG (44px targets, 150–200ms ease-out, reduced motion).
+ * Components read colours only through these variables.
+ */
+:root {
+  color-scheme: light;
+  --social-surface: #ffffff;
+  --social-muted: #f4f4f5;
+  --social-hover: #f8f8f9;
+  --social-border: #e4e4e7;
+  --social-divider: #f0f0f2;
+  --social-fg: #09090b;
+  --social-fg-muted: #71717a;
+  --social-fg-subtle: #a1a1aa;
+  --social-primary: #18181b;
+  --social-primary-fg: #fafafa;
+  --social-badge: #ff3040;
+  --social-bar-bg: rgba(255, 255, 255, 0.86);
+
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.14);
+
+  --touch-min: 44px;
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --social-surface: #09090b;
+  --social-muted: #1c1c1f;
+  --social-hover: #141416;
+  --social-border: #27272a;
+  --social-divider: #1c1c1f;
+  --social-fg: #fafafa;
+  --social-fg-muted: #a1a1aa;
+  --social-fg-subtle: #71717a;
+  --social-primary: #fafafa;
+  --social-primary-fg: #09090b;
+  --social-bar-bg: rgba(9, 9, 11, 0.86);
+
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
 html,
 body,
 #root {
@@ -7,20 +55,74 @@ body,
   margin: 0;
 }
 
-body {
-  background: #f5f8fb;
-  color: #1b1f24;
-  font-family: system-ui, -apple-system, "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Segoe UI", Roboto, sans-serif;
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  background: var(--social-surface);
+  color: var(--social-fg);
 }
 
-/* Links inside leveled text, at rest and while morphing. */
+/* Translucent header / tab bar. */
+.social-bar {
+  background: var(--social-bar-bg);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* Flat card: border, no shadow. */
+.social-card {
+  background: var(--social-surface);
+  border: 1px solid var(--social-border);
+}
+
+/* My own chat bubble: the primary fill. */
+.social-bubble-self {
+  background: var(--social-primary);
+  color: var(--social-primary-fg);
+}
+
+.social-pressable {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+
+@media (hover: hover) {
+  .social-pressable:hover {
+    background-color: var(--social-hover);
+  }
+}
+
+.social-pressable:active {
+  background-color: var(--social-muted);
+}
+
+/* Links inside leveled text: monochrome, underlined. */
 [data-sz-text] a[data-sz-link] {
-  color: #1e6f8c;
+  color: inherit;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration-color: var(--social-fg-subtle);
+  text-underline-offset: 3px;
 }
 
 [data-sz-text] {
-  --sz-paragraph-gap: 0.35em;
+  --sz-paragraph-gap: 0.4em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--social-fg);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
 }

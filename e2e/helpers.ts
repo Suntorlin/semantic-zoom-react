@@ -27,7 +27,7 @@ export async function startRecording(page: Page, tab: Tab, x: number, y: number)
       if (!hit) throw new Error('no item under the point')
       const edgeOf = (el: Element) => (reverse ? el.getBoundingClientRect().bottom : el.getBoundingClientRect().top)
       const c = window.__sz![tab as string]
-      const w = window as unknown as { __rec: { z: number; edge: number; vv: number; morphing: number }[]; __off?: () => void }
+      const w = window as unknown as { __rec: { z: number; edge: number; vv: number; morphing: number; active: boolean }[]; __off?: () => void }
       w.__off?.()
       w.__rec = []
       w.__off = c.addFrameListener(() => {
@@ -36,6 +36,9 @@ export async function startRecording(page: Page, tab: Tab, x: number, y: number)
           edge: edgeOf(hit),
           vv: window.visualViewport?.scale ?? 1,
           morphing: document.querySelectorAll('[data-sz-morph]:not([style*="display: none"])').length,
+          // A pinch or settle is running (frames after it, e.g. the spring-back
+          // of borrowed room on a short list, are not "while zooming").
+          active: c.isGesturing || c.isAnimating || Math.abs(c.value - Math.round(c.value)) > 1e-6,
         })
       })
       return { index: hit.dataset.index!, edge: edgeOf(hit) }
@@ -46,7 +49,7 @@ export async function startRecording(page: Page, tab: Tab, x: number, y: number)
 
 export async function stopRecording(page: Page) {
   return page.evaluate(() => {
-    const w = window as unknown as { __rec: { z: number; edge: number; vv: number; morphing: number }[]; __off?: () => void }
+    const w = window as unknown as { __rec: { z: number; edge: number; vv: number; morphing: number; active: boolean }[]; __off?: () => void }
     w.__off?.()
     w.__off = undefined
     return w.__rec
@@ -117,3 +120,10 @@ export async function ctrlWheel(cdp: CDPSession, page: Page, x: number, y: numbe
 }
 
 export const maxAbs = (xs: number[]) => xs.reduce((m, v) => Math.max(m, Math.abs(v)), 0)
+
+/** Centre of item `index` on screen (pinch and probe there instead of fixed coordinates). */
+export async function itemCenter(page: Page, index: number) {
+  const box = await page.locator(`[data-sz-item][data-index="${index}"]`).boundingBox()
+  if (!box) throw new Error(`item ${index} not on screen`)
+  return { x: Math.round(box.x + box.width / 2), y: Math.round(box.y + box.height / 2) }
+}

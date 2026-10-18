@@ -13,7 +13,7 @@ to the full text. The font size never changes. Words already on screen slide
 to their new spots and new words fade in around them. The entry under your
 fingers stays where it is.
 
-**Live demo:** https://sz-demo.suntorai.com (best on a phone: pinch the list; on a desktop use ctrl + scroll, a trackpad pinch, or Ctrl/⌘ + / −). It is hosted on a personal machine, so it can be offline at times.
+**Live demo:** https://suntorlin.github.io/semantic-zoom-react/ (best on a phone: pinch the list; on a desktop use ctrl + scroll, a trackpad pinch, or Ctrl/⌘ + / −). The demo is styled with the HAQI web design system: monochrome, flat, light and dark.
 
 It is not published to npm.
 

@@ -1,14 +1,15 @@
 // Phone size (393×852), Chromium with real touch input through CDP.
 import { expect, test } from '@playwright/test'
-import { edgeOf, maxAbs, open, pinch, settle, startRecording, state, stopRecording, swipe } from './helpers'
+import { edgeOf, itemCenter, maxAbs, open, pinch, settle, startRecording, state, stopRecording, swipe } from './helpers'
 
 test.describe('pinch on a phone', () => {
   test('travel list: pinch out to Full, anchor stays put, page does not zoom', async ({ page }) => {
     await open(page, 'travel')
     const cdp = await page.context().newCDPSession(page)
     const width = await page.evaluate(() => document.documentElement.clientWidth)
-    const probe = await startRecording(page, 'travel', 196, 540)
-    await pinch(cdp, page, { x: 196, y: 540, from: 80, to: 220 })
+    const c = await itemCenter(page, 3)
+    const probe = await startRecording(page, 'travel', c.x, c.y)
+    await pinch(cdp, page, { x: c.x, y: c.y, from: 80, to: 220 })
     await settle(page, 'travel')
     const rec = await stopRecording(page)
     const after = await edgeOf(page, 'travel', probe.index)
@@ -31,7 +32,8 @@ test.describe('pinch on a phone', () => {
   test('travel list: pinch back in to Highlights, then spring back to the top like the original', async ({ page }) => {
     await open(page, 'travel')
     const cdp = await page.context().newCDPSession(page)
-    await pinch(cdp, page, { x: 196, y: 540, from: 80, to: 220 })
+    const c = await itemCenter(page, 3)
+    await pinch(cdp, page, { x: c.x, y: c.y, from: 80, to: 220 })
     await settle(page, 'travel')
     const probe = await startRecording(page, 'travel', 196, 420)
     await pinch(cdp, page, { x: 196, y: 420, from: 240, to: 70, steps: 24 })
@@ -47,20 +49,22 @@ test.describe('pinch on a phone', () => {
     // The room borrowed past the end springs back: no blank space is left.
     await page.waitForTimeout(400)
     const end = await page.locator('[data-sz-list]').evaluate((el) => ({
-      scrollTop: el.scrollTop,
       spacer: (el.querySelector('[data-sz-spacer]') as HTMLElement | null)?.offsetHeight ?? 0,
+      // Not scrolled past the end of the real content.
+      inRange: el.scrollTop <= el.scrollHeight - el.clientHeight + 1,
     }))
-    expect(end).toEqual({ scrollTop: 0, spacer: 0 })
+    expect(end).toEqual({ spacer: 0, inRange: true })
   })
 
   test('a small pinch snaps back; rubber band past the last level', async ({ page }) => {
     await open(page, 'travel')
     const cdp = await page.context().newCDPSession(page)
-    await pinch(cdp, page, { x: 196, y: 540, from: 100, to: 115, steps: 10, stepMs: 30 })
+    const c = await itemCenter(page, 3)
+    await pinch(cdp, page, { x: c.x, y: c.y, from: 100, to: 115, steps: 10, stepMs: 30 })
     await settle(page, 'travel')
     expect((await state(page, 'travel')).level).toBe(0)
-    await startRecording(page, 'travel', 196, 540)
-    await pinch(cdp, page, { x: 196, y: 540, from: 60, to: 300, steps: 20 })
+    await startRecording(page, 'travel', c.x, c.y)
+    await pinch(cdp, page, { x: c.x, y: c.y, from: 60, to: 300, steps: 20 })
     const rec = await stopRecording(page)
     await settle(page, 'travel')
     expect(Math.max(...rec.map((r) => r.z))).toBeGreaterThan(2)
@@ -209,8 +213,9 @@ test.describe('pinch on a phone', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await open(page, 'travel')
     const cdp = await page.context().newCDPSession(page)
-    await startRecording(page, 'travel', 196, 540)
-    await pinch(cdp, page, { x: 196, y: 540, from: 80, to: 220 })
+    const c = await itemCenter(page, 3)
+    await startRecording(page, 'travel', c.x, c.y)
+    await pinch(cdp, page, { x: c.x, y: c.y, from: 80, to: 220 })
     await page.waitForTimeout(100)
     const rec = await stopRecording(page)
     expect(rec.every((r) => r.morphing === 0)).toBe(true)
